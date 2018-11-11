@@ -8,9 +8,26 @@
 </head>
 <body>
     <h1>Configuración</h1>
+    <div>
 <form action="/config" method="POST">
-    ESSID: <input type="text" name="essid">
-    <input type="submit" value="Enviar">
+    <div style="width: 500px">
+    <ul>
+        <li>ESSID: <input type="text" name="wifissid"></li>
+        <li>PASS: <input type="text" name="wifipass"></li>
+        <li>MQTT Broker: <input type="text" name="mqttbroker" style="width: auto;"></li>
+        <li>MQTT Port: <input type="text" name="mqttport"></li>
+        <li>Topic Temperatura: <input type="text" name="topictemp"></li>
+        <li>Topic Humedad: <input type="text" name="topichum"></li>
+        <li>Topic LDR: <input type="text" name="topicldr"></li>
+        <li>Topic Presencia: <input type="text" name="topicpresencia"></li>
+        <li>MQTT-User: <input type="text" name="mqttuser"></li>
+        <li>MQTT-Pass: <input type="text" name="mqttpass"></li>
+        <li>Cliente ID: <input type="text" name="clientid"></li>
+        <li>Password de administrador: <input type="text" name="adminpass"></li>
+         <li><input type="submit" value="Enviar"></li>
+    </ul>
+    </div>
 </form>
+    </div>
 </body>
 </html>

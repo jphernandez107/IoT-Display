@@ -4,3 +4,9 @@ body {
     margin-bottom: 30px;
     margin-left: 30px;
 }
+
+input{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-left: 200px;
+}
