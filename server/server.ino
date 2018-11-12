@@ -37,7 +37,7 @@ String clientID = "ESP-Juan";
 String facultad = "ingenieria";
 String aula = "sala_c";
 
-String topicGen = "/" + facultad + "/" + aula + "/" + clientID + "/";
+String topicGen = "/" + facultad + "/" + aula + "/";
 String topicTemp = topicGen + "temp";    //Topics invertidos con Living
 String topicHum = topicGen + "hum";   //Topics invertidos con Comedor
 String topicLdr = topicGen + "ldr";
@@ -81,7 +81,7 @@ TFT_eSPI tft = TFT_eSPI();
 
 
 //Callback para el mqtt.
-void callback(/*const MQTT::Publish& pub*/ char* topic, byte* payload, unsigned int length) {
+void callback(char* topic, byte* payload, unsigned int length) {
   String pay = "";
   String topicT = String(topic);
   for (int i = 0; i < length; i++) {
@@ -90,7 +90,6 @@ void callback(/*const MQTT::Publish& pub*/ char* topic, byte* payload, unsigned 
 
   if (topicT == topicTemp) {
     temp = pay.toFloat();
-    Serial.println(temp);
   } else if (topicT == topicHum) {
     hum = pay.toFloat();
   } else if (topicT == topicLdr) {
@@ -122,6 +121,10 @@ void setup(void) {
   tft.init();
   tft.setRotation(3); //0 vertical
   tft.fillScreen(BLACK);
+  tft.setCursor(10, 110);
+  tft.setTextSize(3);
+  tft.setTextColor(CYAN, BLACK);
+  tft.print("INICIALIZANDO...");
 }
 
 void loop(void) {
@@ -201,17 +204,23 @@ void loop(void) {
   }
   tft.print(humT);
 
-  tft.setCursor (210, 164); //heat index fahrenheit
+  tft.setCursor (210, 164);
   tft.setTextSize (2);
   tft.setTextColor (WHITE, BLACK);
   tft.print ("Luz: ");
   tft.setCursor(260, 164);
   tft.print (ldr);
 
+  tft.setCursor(205, 8);
+  tft.setTextSize(1);
+  tft.setTextColor(CYAN, BLACK);
+  tft.print("IP: ");
+  tft.print(WiFi.localIP());
+
   if (presencia) {
-    crearPersona(255, 30, YELLOW);
+    crearPersona(255, 38, YELLOW);
   } else {
-    crearPersona(255, 30, WHITE);
+    crearPersona(255, 38, WHITE);
   }
   delay(10);
 }
@@ -248,9 +257,9 @@ void pararWebServer() {
 
 // Conexion de wifi y conexion con el broker MQTT
 void wifiSetup() {
-  //Serial.println("Estoy en el wifiSetup");
-  if (WiFi.status() != WL_CONNECTED /*&& (millis() - actual >= timeFlag)*/) {
-    //actual = millis();
+  
+  if (WiFi.status() != WL_CONNECTED) {
+    tft.fillScreen(BLACK);
     if (updateFlag) {
       EEPROM.get(0, conf);
       ssid = conf.wifi_ssid;

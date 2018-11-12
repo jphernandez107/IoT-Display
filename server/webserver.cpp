@@ -13,8 +13,6 @@ ESP8266WebServer server(80);
 void handleRoot() {
   server.sendHeader("Content-Encoding", "gzip");
   server.send_P(200, "text/html", index_html_gz, index_html_gz_len);
-  //server.sendHeader("Content-Encoding", "gzip");
-  //server.send_P(200, "text/html", index_html_gz, index_html_gz_len);
 }
 
 void handleConfig() {
@@ -24,61 +22,62 @@ void handleConfig() {
   String wifi_pass(server.arg("wifipass"));
   String mqtt_broker(server.arg("mqttbroker"));
   String mqtt_port(server.arg("mqttport"));
+  String mqtt_user(server.arg("mqttuser"));
+  String mqtt_pass(server.arg("mqttpass"));
   String topic_temp(server.arg("topictemp"));
   String topic_hum(server.arg("topichum"));
   String topic_ldr(server.arg("topicldr"));
   String topic_presencia(server.arg("topicpresencia"));
-  String mqtt_user(server.arg("mqttuser"));
-  String mqtt_pass(server.arg("mqttpass"));
   String admin_pass(server.arg("adminpass"));
   String client_id(server.arg("clientid"));
+  String empty = empty;
 
-  if (wifi_ssid != "") {
+  if (wifi_ssid != empty) {
     wifi_ssid.toCharArray(newConfig.wifi_ssid, 50);
   }
-  if (wifi_pass != "") {
+  if (wifi_pass != empty && !wifi_pass.equals("empty")) {
     wifi_pass.toCharArray(newConfig.wifi_pass, 50);
-  } else if (wifi_pass == "null")
+  } else if (wifi_pass.equals("empty"))
   {
-    wifi_pass.toCharArray("", 20);
+    empty.toCharArray(newConfig.wifi_pass, 20);
   }
-  if (mqtt_broker != "") {
+  if (mqtt_broker != empty) {
     mqtt_broker.toCharArray(newConfig.mqtt_broker, 50);
   }
-  if (mqtt_port != "") {
+  if (mqtt_port != empty) {
     newConfig.broker_puerto = mqtt_port.toInt();
   }
-  if (topic_temp != "") {
+  if (topic_temp != empty) {
     topic_temp.toCharArray(newConfig.topic_temp, 100);
   }
-  if (topic_hum != "") {
+  if (topic_hum != empty) {
     topic_hum.toCharArray(newConfig.topic_hum, 100);
   }
-  if (topic_ldr != "") {
+  if (topic_ldr != empty) {
     topic_ldr.toCharArray(newConfig.topic_ldr, 100);
   }
-  if (topic_presencia != "") {
+  if (topic_presencia != empty) {
     topic_presencia.toCharArray(newConfig.topic_presencia, 100);
   }
-  if (mqtt_user != "") {
+  if (mqtt_user != empty && !mqtt_user.equals("null")) {
     mqtt_user.toCharArray(newConfig.mqtt_user, 50);
-  } else if (mqtt_user == "null")
+  } else if (mqtt_user.equals("null"))
   {
-    mqtt_user.toCharArray("", 20);
+    empty.toCharArray(newConfig.mqtt_user, 20);
   }
-  if (mqtt_pass != "") {
+  if (mqtt_pass != empty && mqtt_pass != "null") {
     mqtt_pass.toCharArray(newConfig.mqtt_pass, 50);
   } else if (mqtt_pass == "null")
   {
-    mqtt_pass.toCharArray("", 20);
+    empty.toCharArray(newConfig.mqtt_pass, 20);
   }
-  if (admin_pass != "") {
+  if (admin_pass != empty && admin_pass != "null") {
     admin_pass.toCharArray(newConfig.admin_pass, 20);
   } else if (admin_pass == "null")
   {
-    admin_pass.toCharArray("", 20);
+    empty.toCharArray(newConfig.admin_pass, 20);
   }
-  if (client_id != "") {
+  if (client_id != empty) {
     client_id.toCharArray(newConfig.client_id, 10);
   }
   EEPROM.put(0, newConfig);

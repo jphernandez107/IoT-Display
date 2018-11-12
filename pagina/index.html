@@ -7,27 +7,134 @@
     <link rel="stylesheet" href="css/estilos.css">
 </head>
 <body>
-    <h1>Configuración</h1>
-    <div>
-<form action="/config" method="POST">
-    <div style="width: 500px">
-    <ul>
-        <li>ESSID: <input type="text" name="wifissid"></li>
-        <li>PASS: <input type="text" name="wifipass"></li>
-        <li>MQTT Broker: <input type="text" name="mqttbroker" style="width: auto;"></li>
-        <li>MQTT Port: <input type="text" name="mqttport"></li>
-        <li>Topic Temperatura: <input type="text" name="topictemp"></li>
-        <li>Topic Humedad: <input type="text" name="topichum"></li>
-        <li>Topic LDR: <input type="text" name="topicldr"></li>
-        <li>Topic Presencia: <input type="text" name="topicpresencia"></li>
-        <li>MQTT-User: <input type="text" name="mqttuser"></li>
-        <li>MQTT-Pass: <input type="text" name="mqttpass"></li>
-        <li>Cliente ID: <input type="text" name="clientid"></li>
-        <li>Password de administrador: <input type="text" name="adminpass"></li>
-         <li><input type="submit" value="Enviar"></li>
-    </ul>
-    </div>
-</form>
+
+    <div class="container">
+        <h1>Configuración</h1>
+        <form action="/config" method="POST">
+            <div class="row">
+                <div class="col-25">
+                    <label><h4>WiFi</h4></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="wifissid">SSID:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="wifissid" name="wifissid">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="wifipass">Password:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="wifipass" name="wifipass">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="clientID">ID de Cliente:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="clientID" name="clientid">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label><h4>Datos MQTT</h4></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="brk">Broker:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="brk" name="mqttbroker">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="port">Puerto:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="port" name="mqttport">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="userm">User:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="userm" name="mqttuser">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="passm">Password:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="passm" name="mqttpass">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label><h4>TOPICS</h4></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="temp">Temperatura:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="temp" name="topictemp">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="hum">Humedad:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="hum" name="topichum">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="ldr">LDR:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="ldr" name="topicldr">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="pr">Presencia:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="pr" name="topicpresencia">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label><h4>Administración</h4></label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-25">
+                    <label for="passa">Password de Administrador:</label>
+                </div>
+                <div class="col-75">
+                    <input type="text" id="passa" name="adminpass">
+                </div>
+            </div>
+            <br>
+            Nota: Los campos que no deban ser modificados se dejan en blanco. Para dejar contraseñas u otros datos en blanco, completar el campo con
+            la palabra "null" (Sin comillas).
+            <br>
+            <div class="row">
+                <input type="submit" value="Cargar Datos">
+            </div>
+        </form>
     </div>
 </body>
 </html>
