@@ -13,10 +13,23 @@ ESP8266WebServer server(80);
 void handleRoot() {
   config_t confi;
   EEPROM.get(0, confi);
-  if (confi.admin_pass == "" && confi.admin_user == "") {
+  String pass = confi.admin_pass;
+  String user = confi.admin_user;
+  Serial.print("Toy en handleRoot, pass: ");
+  Serial.println(pass);
+  Serial.print("Toy en handleRoot, user: ");
+  Serial.println(user);
+  
+  if (pass.equals(".") && user.equals(".")) {
     confi.admin_protected = 0;
+    Serial.print("Toy en handleRoot, hice 0 el adminProtected ");
   }
+  EEPROM.put(0, confi);
+  EEPROM.commit();
+  EEPROM.get(0, confi);
+  Serial.print(confi.admin_protected);
   if (confi.admin_protected == 1) {
+    Serial.print("Toy en handleRoot, dentro del if ");
     if (!server.authenticate(confi.admin_user,confi.admin_pass)) {
        return server.requestAuthentication();
     }
@@ -49,7 +62,7 @@ void handleConfig() {
     empty.toCharArray(newConfig.admin_user, 20);
     empty.toCharArray(newConfig.admin_pass, 20);
   }
-  else {
+  else if (server.arg("adminpass") != "null" && server.arg("adminuser") != "null"){
     newConfig.admin_protected = 1;
   }
 
@@ -96,14 +109,14 @@ void handleConfig() {
     admin_pass.toCharArray(newConfig.admin_pass, 20);
   } else if (admin_pass == "null")
   {
-    
+    admin_pass.toCharArray(".", 20);
   }
   
   if (admin_user != empty && admin_user != "null") {
     admin_user.toCharArray(newConfig.admin_user, 20);
   } else if (admin_user == "null")
   {
-    
+    admin_user.toCharArray(".", 20);
   }
   if (client_id != empty) {
     client_id.toCharArray(newConfig.client_id, 10);
