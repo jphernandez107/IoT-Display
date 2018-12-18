@@ -11,11 +11,22 @@ bool actualizar = false;
 ESP8266WebServer server(80);
 
 void handleRoot() {
+  config_t confi;
+  EEPROM.get(0, confi);
+  if (confi.admin_pass == "" && confi.admin_user == "") {
+    confi.admin_protected = 0;
+  }
+  if (confi.admin_protected == 1) {
+    if (!server.authenticate(confi.admin_user,confi.admin_pass)) {
+       return server.requestAuthentication();
+    }
+  }
   server.sendHeader("Content-Encoding", "gzip");
   server.send_P(200, "text/html", index_html_gz, index_html_gz_len);
 }
 
 void handleConfig() {
+  Serial.println("Estamos en handelConfi()");
   EEPROM.get(0, newConfig);
 
   String wifi_ssid(server.arg("wifissid"));
@@ -28,16 +39,26 @@ void handleConfig() {
   String topic_hum(server.arg("topichum"));
   String topic_ldr(server.arg("topicldr"));
   String topic_presencia(server.arg("topicpresencia"));
+  String admin_user(server.arg("adminuser"));
   String admin_pass(server.arg("adminpass"));
   String client_id(server.arg("clientid"));
-  String empty = empty;
+  String empty = "";
+
+  if (server.arg("adminpass") == "null" && server.arg("adminuser") == "null") {
+    newConfig.admin_protected = 0;
+    empty.toCharArray(newConfig.admin_user, 20);
+    empty.toCharArray(newConfig.admin_pass, 20);
+  }
+  else {
+    newConfig.admin_protected = 1;
+  }
 
   if (wifi_ssid != empty) {
     wifi_ssid.toCharArray(newConfig.wifi_ssid, 50);
   }
-  if (wifi_pass != empty && !wifi_pass.equals("empty")) {
+  if (wifi_pass != empty && !wifi_pass.equals("null")) {
     wifi_pass.toCharArray(newConfig.wifi_pass, 50);
-  } else if (wifi_pass.equals("empty"))
+  } else if (wifi_pass.equals("null"))
   {
     empty.toCharArray(newConfig.wifi_pass, 20);
   }
@@ -75,7 +96,14 @@ void handleConfig() {
     admin_pass.toCharArray(newConfig.admin_pass, 20);
   } else if (admin_pass == "null")
   {
-    empty.toCharArray(newConfig.admin_pass, 20);
+    
+  }
+  
+  if (admin_user != empty && admin_user != "null") {
+    admin_user.toCharArray(newConfig.admin_user, 20);
+  } else if (admin_user == "null")
+  {
+    
   }
   if (client_id != empty) {
     client_id.toCharArray(newConfig.client_id, 10);

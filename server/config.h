@@ -16,7 +16,9 @@ typedef struct {
   char mqtt_pass[50];
 
   //extras
+  int admin_protected;
   char admin_pass[20];
+  char admin_user[20];
 
   char client_id[10];
 

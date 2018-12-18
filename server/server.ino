@@ -17,6 +17,8 @@ const char* pass = "";
 uint8_t wiFlag = 0;
 long timeFlag = 3000;
 long actual = 0;
+long timeOut = 10000;
+long actual1 =0;
 
 config_t conf;
 
@@ -108,7 +110,7 @@ void setup(void) {
   EEPROM.get(0, conf);
 
   Serial.begin(115200);
-
+  WiFi.disconnect();
   ssid = conf.wifi_ssid;
   pass = conf.wifi_pass;
   mqttBroker = conf.mqtt_broker;
@@ -123,14 +125,17 @@ void setup(void) {
   tft.fillScreen(BLACK);
   tft.setCursor(10, 110);
   tft.setTextSize(3);
-  tft.setTextColor(CYAN, BLACK);
+  tft.setTextColor(CYAN_BLACK, BLACK);
   tft.print("INICIALIZANDO...");
 }
 
 void loop(void) {
 
   updateFlag = WebServer_getActualizar();
-  wifiSetup();
+  if((millis() - actual) >= timeOut){
+    wifiSetup();
+    actual = millis();
+  }
   // Verificamos si hubo cambio en los datos a traves del server.
   if (updateFlag) {
     EEPROM.get(0, conf);
@@ -156,6 +161,7 @@ void loop(void) {
 
   if (!WebServer_isRunning()) {
     iniciarWebServer();
+    Serial.println("Server iniciado");
   }
   //DNS
   dnsServer.processNextRequest();
@@ -165,62 +171,64 @@ void loop(void) {
 
   // Seccion Grafica!
 
-  tft.setCursor (67, 70);
-  tft.setTextSize (1);
-  tft.setTextColor (WHITE, BLACK);
-  tft.print ("TEMPERATURA");
-  tft.setCursor (70, 66);
-  tft.setTextSize (1);
-  tft.setTextColor (WHITE, BLACK);
+  if (WiFi.status() == WL_CONNECTED) {
+    tft.setCursor (67, 70);
+    tft.setTextSize (1);
+    tft.setTextColor (WHITE, BLACK);
+    tft.print ("TEMPERATURA");
+    tft.setCursor (70, 66);
+    tft.setTextSize (1);
+    tft.setTextColor (WHITE, BLACK);
 
-  uint16_t xpos = 0, ypos = 5, gap = 4, radius = 52;
+    uint16_t xpos = 0, ypos = 5, gap = 4, radius = 52;
 
-  // Iniciamos el anillo de temperatura
-  xpos = 320 / 2 - 151, ypos = 7, gap = 100, radius = 90;
-  ringMeter(temp, 0, 45, xpos, ypos, radius, "Celsius", GREEN2RED);
+    // Iniciamos el anillo de temperatura
+    xpos = 320 / 2 - 151, ypos = 7, gap = 100, radius = 90;
+    ringMeter(temp, 0, 45, xpos, ypos, radius, "Celsius", GREEN2RED);
 
-  tft.fillRect(0, 190, 320, 4, BLUE);
-  tft.fillRect(0, 236, 320, 4, BLUE);
-  tft.fillRect(195, 0, 4, 194, BLUE);
-  tft.fillRect(195, 151, 320, 4, BLUE);
-  tft.fillRect(0, 0, 4, 240, BLUE);
-  tft.fillRect(0, 0, 320, 4, BLUE);
-  tft.fillRect(316, 0, 4, 240, BLUE);
+    tft.fillRect(0, 190, 320, 4, BLUE);
+    tft.fillRect(0, 236, 320, 4, BLUE);
+    tft.fillRect(195, 0, 4, 194, BLUE);
+    tft.fillRect(195, 151, 320, 4, BLUE);
+    tft.fillRect(0, 0, 4, 240, BLUE);
+    tft.fillRect(0, 0, 320, 4, BLUE);
+    tft.fillRect(316, 0, 4, 240, BLUE);
 
-  tft.setCursor (9, 203); //208
-  tft.setTextSize (3);
-  tft.setTextColor (YELLOW, BLACK);
-  tft.print ("HUMEDAD: ");
+    tft.setCursor (9, 203); //208
+    tft.setTextSize (3);
+    tft.setTextColor (YELLOW, BLACK);
+    tft.print ("HUMEDAD: ");
 
-  tft.setCursor(170, 203);
-  String humT;
-  if (hum >= 10 && hum < 100) {
-    humT = String(hum) + "%";
-  } else if (hum < 10) {
-    humT = "0" + String(hum) + "%";
-  } else {
-    hum = 99.99;
-    humT = String(hum) + "%";
-  }
-  tft.print(humT);
+    tft.setCursor(170, 203);
+    String humT;
+    if (hum >= 10 && hum < 100) {
+      humT = String(hum) + "%";
+    } else if (hum < 10) {
+      humT = "0" + String(hum) + "%";
+    } else {
+      hum = 99.99;
+      humT = String(hum) + "%";
+    }
+    tft.print(humT);
 
-  tft.setCursor (210, 164);
-  tft.setTextSize (2);
-  tft.setTextColor (WHITE, BLACK);
-  tft.print ("Luz: ");
-  tft.setCursor(260, 164);
-  tft.print (ldr);
+    tft.setCursor (210, 164);
+    tft.setTextSize (2);
+    tft.setTextColor (WHITE, BLACK);
+    tft.print ("Luz: ");
+    tft.setCursor(260, 164);
+    tft.print (ldr);
 
-  tft.setCursor(205, 8);
-  tft.setTextSize(1);
-  tft.setTextColor(CYAN, BLACK);
-  tft.print("IP: ");
-  tft.print(WiFi.localIP());
+    tft.setCursor(205, 8);
+    tft.setTextSize(1);
+    tft.setTextColor(CYAN, BLACK);
+    tft.print("IP: ");
+    tft.print(WiFi.localIP());
 
-  if (presencia) {
-    crearPersona(255, 38, YELLOW);
-  } else {
-    crearPersona(255, 38, WHITE);
+    if (presencia) {
+      crearPersona(255, 38, YELLOW);
+    } else {
+      crearPersona(255, 38, WHITE);
+    }
   }
   delay(10);
 }
@@ -257,15 +265,26 @@ void pararWebServer() {
 
 // Conexion de wifi y conexion con el broker MQTT
 void wifiSetup() {
-  
+
   if (WiFi.status() != WL_CONNECTED) {
     tft.fillScreen(BLACK);
+    tft.setCursor(10, 110);
+    tft.setTextSize(2);
+    tft.setTextColor(CYAN_BLACK, BLACK);
     if (updateFlag) {
       EEPROM.get(0, conf);
       ssid = conf.wifi_ssid;
       pass = conf.wifi_pass;
       WebServer_setActualizar(false);
     }
+    tft.print("Conectando a ");
+    tft.print(ssid);
+    tft.print("...");
+    tft.print("\n");
+    tft.print("SSID: IoT-JuanH");
+    tft.print("\n");
+    tft.print("IP de Conf: 192.168.4.1");
+    
     Serial.print("Conectando a ");
     Serial.print(ssid);
     Serial.println("...");
@@ -274,6 +293,7 @@ void wifiSetup() {
     if (WiFi.waitForConnectResult() != WL_CONNECTED) {
       return;
     }
+    tft.fillScreen(BLACK);
     Serial.println("");
     Serial.println("WiFi conectado");
     Serial.print("Direccion IP: ");
